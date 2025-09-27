@@ -53,6 +53,30 @@ app.post('/addfarmer', async (req, res) => {
     }
 });
 
+app.post('/adddistributor', async (req, res) => {
+    try {
+        const { account } = req.body;
+        if (!account) throw new Error('Account required');
+        const tx = await contract.methods.addDistributor(account).send({ from: account, gas: 3000000 });
+        res.send('Distributor added');
+    } catch (error) {
+        console.error('AddDistributor error:', error.message);
+        res.status(500).send(`Error: ${error.message}`);
+    }
+});
+
+app.post('/addretailer', async (req, res) => {
+    try {
+        const { account } = req.body;
+        if (!account) throw new Error('Account required');
+        const tx = await contract.methods.addRetailer(account).send({ from: account, gas: 3000000 });
+        res.send('Retailer added');
+    } catch (error) {
+        console.error('AddRetailer error:', error.message);
+        res.status(500).send(`Error: ${error.message}`);
+    }
+});
+
 app.post('/harvest', async (req, res) => {
     try {
         const { name, origin, price, quality, account } = req.body;
@@ -68,6 +92,114 @@ app.post('/harvest', async (req, res) => {
         res.send('Item harvested');
     } catch (error) {
         console.error('Harvest error:', error.message, error.stack);
+        res.status(500).send(`Error: ${error.message}`);
+    }
+});
+
+app.post('/purchase-by-distributor', async (req, res) => {
+    try {
+        const { itemId, account, price } = req.body;
+        if (!itemId || !account || !price) throw new Error('Missing required fields');
+        const tx = await contract.methods.purchaseByDistributor(parseInt(itemId)).send({
+            from: account,
+            value: price,
+            gas: 3000000
+        });
+        res.send('Item purchased by distributor');
+    } catch (error) {
+        console.error('Purchase by distributor error:', error.message);
+        res.status(500).send(`Error: ${error.message}`);
+    }
+});
+
+app.post('/set-distributor-margin', async (req, res) => {
+    try {
+        const { itemId, account, margin } = req.body;
+        if (!itemId || !account || !margin) throw new Error('Missing required fields');
+        const tx = await contract.methods.setDistributorMargin(parseInt(itemId), parseInt(margin)).send({
+            from: account,
+            gas: 3000000
+        });
+        res.send('Distributor margin set successfully');
+    } catch (error) {
+        console.error('Set distributor margin error:', error.message);
+        res.status(500).send(`Error: ${error.message}`);
+    }
+});
+
+app.post('/ship-by-distributor', async (req, res) => {
+    try {
+        const { itemId, account } = req.body;
+        if (!itemId || !account) throw new Error('Missing required fields');
+        const tx = await contract.methods.shipItem(parseInt(itemId)).send({
+            from: account,
+            gas: 3000000
+        });
+        res.send('Item shipped by distributor');
+    } catch (error) {
+        console.error('Ship by distributor error:', error.message);
+        res.status(500).send(`Error: ${error.message}`);
+    }
+});
+
+app.post('/receive-by-retailer', async (req, res) => {
+    try {
+        const { itemId, account } = req.body;
+        if (!itemId || !account) throw new Error('Missing required fields');
+        const tx = await contract.methods.receiveByRetailer(parseInt(itemId)).send({
+            from: account,
+            gas: 3000000
+        });
+        res.send('Item received by retailer');
+    } catch (error) {
+        console.error('Receive by retailer error:', error.message);
+        res.status(500).send(`Error: ${error.message}`);
+    }
+});
+
+app.post('/set-retailer-margin', async (req, res) => {
+    try {
+        const { itemId, account, margin } = req.body;
+        if (!itemId || !account || !margin) throw new Error('Missing required fields');
+        const tx = await contract.methods.setRetailerMargin(parseInt(itemId), parseInt(margin)).send({
+            from: account,
+            gas: 3000000
+        });
+        res.send('Retailer margin set successfully');
+    } catch (error) {
+        console.error('Set retailer margin error:', error.message);
+        res.status(500).send(`Error: ${error.message}`);
+    }
+});
+
+app.post('/purchase-by-retailer', async (req, res) => {
+    try {
+        const { itemId, account, price } = req.body;
+        if (!itemId || !account || !price) throw new Error('Missing required fields');
+        const tx = await contract.methods.purchaseByRetailer(parseInt(itemId)).send({
+            from: account,
+            value: price,
+            gas: 3000000
+        });
+        res.send('Item purchased by retailer');
+    } catch (error) {
+        console.error('Purchase by retailer error:', error.message);
+        res.status(500).send(`Error: ${error.message}`);
+    }
+});
+
+app.post('/purchase-by-consumer', async (req, res) => {
+    try {
+        const { itemId, account, price } = req.body;
+        if (!itemId || !account || !price) throw new Error('Missing required fields');
+        const tx = await contract.methods.purchaseByConsumer(parseInt(itemId)).send({
+            from: account,
+            value: price,
+            gas: 3000000
+        });
+        res.send('Item purchased by consumer');
+    } catch (error) {
+        console.error('Purchase by consumer error:', error.message);
         res.status(500).send(`Error: ${error.message}`);
     }
 });
@@ -92,17 +224,21 @@ app.get('/items', async (req, res) => {
                 
                 // Only include items that exist (have a farmer)
                 if (item[6] !== '0x0000000000000000000000000000000000000000') {
-                    const safeItem = {
+                const safeItem = {
                         id: item[0].toString(),
                         name: item[1],
                         origin: item[2],
-                        price: item[3].toString(),
-                        quality: item[4],
-                        state: item[5].toString(),
-                        farmer: item[6],
-                        distributor: item[7],
-                        retailer: item[8],
-                        consumer: item[9]
+                        farmerPrice: item[3].toString(),      // New structure
+                        distributorPrice: item[4].toString(), // New structure
+                        retailerPrice: item[5].toString(),    // New structure
+                        quality: item[6],
+                        state: item[7].toString(),
+                        farmer: item[8],
+                        distributor: item[9],
+                        retailer: item[10],
+                        consumer: item[11],
+                        // Legacy field for backward compatibility
+                        price: item[5].toString()
                     };
                     items.push(safeItem);
                 }
@@ -134,22 +270,31 @@ app.get('/item/:id', async (req, res) => {
         const item = await contract.methods.items(req.params.id).call();
         
         // Check if item exists by verifying farmer is not zero address
-        if (item[6] === '0x0000000000000000000000000000000000000000') {
+        if (item[8] === '0x0000000000000000000000000000000000000000') {
             return res.status(404).send(`Item ${req.params.id} not found`);
         }
+        
+        // Get margins
+        const margins = await contract.methods.itemMargins(req.params.id).call();
         
         // Convert BigInt fields to strings - access as struct properties
         const safeItem = {
             id: item[0].toString(),
             name: item[1],
             origin: item[2],
-            price: item[3].toString(),
-            quality: item[4],
-            state: item[5].toString(),
-            farmer: item[6],
-            distributor: item[7],
-            retailer: item[8],
-            consumer: item[9]
+            farmerPrice: item[3].toString(),
+            distributorPrice: item[4].toString(),
+            retailerPrice: item[5].toString(),
+            quality: item[6],
+            state: item[7].toString(),
+            farmer: item[8],
+            distributor: item[9],
+            retailer: item[10],
+            consumer: item[11],
+            distributorMargin: margins[0].toString(),
+            retailerMargin: margins[1].toString(),
+            // Legacy field for backward compatibility
+            price: item[5].toString()
         };
         console.log('Safe item data:', safeItem);
         res.json(safeItem);
@@ -160,6 +305,27 @@ app.get('/item/:id', async (req, res) => {
         } else {
             res.status(500).send(`Error: ${error.message}`);
         }
+    }
+});
+
+app.get('/price-breakdown/:id', async (req, res) => {
+    try {
+        const itemId = parseInt(req.params.id);
+        const breakdown = await contract.methods.getPriceBreakdown(itemId).call();
+        
+        const safeBreakdown = {
+            farmerPrice: breakdown.farmerPrice.toString(),
+            distributorMargin: breakdown.distributorMargin.toString(),
+            distributorPrice: breakdown.distributorPrice.toString(),
+            retailerMargin: breakdown.retailerMargin.toString(),
+            retailerPrice: breakdown.retailerPrice.toString(),
+            totalMargin: breakdown.totalMargin.toString()
+        };
+        
+        res.json(safeBreakdown);
+    } catch (error) {
+        console.error('Error fetching price breakdown:', error.message);
+        res.status(500).json({ error: error.message });
     }
 });
 

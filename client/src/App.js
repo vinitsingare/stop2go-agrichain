@@ -5,6 +5,10 @@ import Dashboard from './components/Dashboard';
 import AddFarmer from './components/AddFarmer';
 import HarvestItem from './components/HarvestItem';
 import TrackItem from './components/TrackItem';
+import RoleSelector from './components/RoleSelector';
+import DistributorPanel from './components/DistributorPanel';
+import RetailerPanel from './components/RetailerPanel';
+import ConsumerPanel from './components/ConsumerPanel';
 import Footer from './components/Footer';
 
 function App() {
@@ -12,6 +16,8 @@ function App() {
   const [accounts, setAccounts] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [isLoadingAccounts, setIsLoadingAccounts] = useState(true);
+  const [selectedRole, setSelectedRole] = useState(null);
+  const [selectedAccount, setSelectedAccount] = useState(null);
 
   // Fetch accounts from blockchain on app load
   useEffect(() => {
@@ -45,6 +51,48 @@ function App() {
     }, 5000);
   };
 
+  const handleRoleSelect = async (role, account) => {
+    setSelectedRole(role);
+    setSelectedAccount(account);
+    setActiveTab('role-panel');
+    
+    // Automatically register the user in their selected role
+    try {
+      let endpoint = '';
+      if (role === 'farmer') {
+        endpoint = '/addfarmer';
+      } else if (role === 'distributor') {
+        endpoint = '/adddistributor';
+      } else if (role === 'retailer') {
+        endpoint = '/addretailer';
+      }
+      
+      if (endpoint) {
+        const response = await fetch(`http://localhost:5000${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ account })
+        });
+        
+        if (response.ok) {
+          addNotification(`✅ Registered as ${role} and selected account ${account.slice(0, 6)}...${account.slice(-4)}`, 'success');
+        } else {
+          addNotification(`⚠️ Selected as ${role} but registration failed. You may need to register manually.`, 'warning');
+        }
+      } else {
+        addNotification(`✅ Selected as ${role} with account ${account.slice(0, 6)}...${account.slice(-4)}`, 'success');
+      }
+    } catch (error) {
+      addNotification(`⚠️ Selected as ${role} but registration failed: ${error.message}`, 'warning');
+    }
+  };
+
+  const handleBackToRoleSelection = () => {
+    setSelectedRole(null);
+    setSelectedAccount(null);
+    setActiveTab('role-selector');
+  };
+
   return (
     <div className="App">
       <Header activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -62,6 +110,38 @@ function App() {
           )}
 
           {activeTab === 'dashboard' && <Dashboard />}
+          {activeTab === 'role-selector' && (
+            isLoadingAccounts ? (
+              <div className="loading">
+                <div className="spinner"></div>
+                <p>Loading blockchain accounts...</p>
+              </div>
+            ) : (
+              <RoleSelector accounts={accounts} onRoleSelect={handleRoleSelect} />
+            )
+          )}
+          {activeTab === 'role-panel' && selectedRole && selectedAccount && (
+            <>
+              <div className="role-header">
+                <button className="back-button" onClick={handleBackToRoleSelection}>
+                  ← Back to Role Selection
+                </button>
+                <h2>Current Role: {selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}</h2>
+              </div>
+              {selectedRole === 'farmer' && (
+                <HarvestItem accounts={[selectedAccount]} selectedAccount={selectedAccount} addNotification={addNotification} />
+              )}
+              {selectedRole === 'distributor' && (
+                <DistributorPanel selectedAccount={selectedAccount} addNotification={addNotification} />
+              )}
+              {selectedRole === 'retailer' && (
+                <RetailerPanel selectedAccount={selectedAccount} addNotification={addNotification} />
+              )}
+              {selectedRole === 'consumer' && (
+                <ConsumerPanel selectedAccount={selectedAccount} addNotification={addNotification} />
+              )}
+            </>
+          )}
           {activeTab === 'add-farmer' && (
             isLoadingAccounts ? (
               <div className="loading">

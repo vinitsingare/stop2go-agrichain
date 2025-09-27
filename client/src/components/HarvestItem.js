@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 
-const HarvestItem = ({ accounts, addNotification }) => {
+const HarvestItem = ({ accounts, selectedAccount, addNotification }) => {
   const [formData, setFormData] = useState({
     name: '',
     origin: '',
     price: '',
     quality: '',
-    account: accounts[0]
+    account: selectedAccount || accounts[0]
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -43,7 +43,7 @@ const HarvestItem = ({ accounts, addNotification }) => {
           origin: '',
           price: '',
           quality: '',
-          account: accounts[0]
+          account: selectedAccount || accounts[0]
         });
       } else {
         const error = await response.text();
