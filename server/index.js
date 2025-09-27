@@ -223,7 +223,7 @@ app.get('/items', async (req, res) => {
                 const item = await contract.methods.items(i).call();
                 
                 // Only include items that exist (have a farmer)
-                if (item[6] !== '0x0000000000000000000000000000000000000000') {
+                if (item[8] !== '0x0000000000000000000000000000000000000000') {
                 const safeItem = {
                         id: item[0].toString(),
                         name: item[1],
