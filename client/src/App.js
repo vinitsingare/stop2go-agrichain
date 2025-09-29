@@ -142,26 +142,6 @@ function App() {
               )}
             </>
           )}
-          {activeTab === 'add-farmer' && (
-            isLoadingAccounts ? (
-              <div className="loading">
-                <div className="spinner"></div>
-                <p>Loading blockchain accounts...</p>
-              </div>
-            ) : (
-              <AddFarmer accounts={accounts} addNotification={addNotification} />
-            )
-          )}
-          {activeTab === 'harvest' && (
-            isLoadingAccounts ? (
-              <div className="loading">
-                <div className="spinner"></div>
-                <p>Loading blockchain accounts...</p>
-              </div>
-            ) : (
-              <HarvestItem accounts={accounts} addNotification={addNotification} />
-            )
-          )}
           {activeTab === 'track' && <TrackItem addNotification={addNotification} />}
         </div>
       </main>

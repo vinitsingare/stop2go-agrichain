@@ -49,31 +49,31 @@ const TrackItem = ({ addNotification }) => {
   };
 
   return (
-    <div className="track-item">
-      <div className="page-header">
-        <h2>🔍 Track Item</h2>
-        <p>Search and verify agricultural products on the blockchain</p>
+    <div className="track-item modern-page">
+      <div className="page-header modern-header">
+        <h2 className="modern-title">🔍 Track Item</h2>
+        <p className="modern-subtitle">Search and verify agricultural products on the blockchain</p>
       </div>
 
-      <div className="search-section">
-        <form onSubmit={handleTrackItem} className="search-form">
-          <div className="search-input-group">
+      <div className="search-section modern-search">
+        <form onSubmit={handleTrackItem} className="search-form modern-form">
+          <div className="search-input-group modern-input-group">
             <input
               type="number"
               value={itemId}
               onChange={(e) => setItemId(e.target.value)}
               placeholder="Enter Item ID (e.g., 1, 2, 3...)"
-              className="search-input"
+              className="search-input modern-input"
               min="1"
               required
             />
             <button 
               type="submit" 
-              className={`search-btn ${isLoading ? 'loading' : ''}`}
+              className={`search-btn modern-btn ${isLoading ? 'loading' : ''}`}
               disabled={isLoading || !itemId}
             >
               {isLoading ? (
-                <span className="spinner-small"></span>
+                <span className="spinner-small modern-spinner"></span>
               ) : (
                 <>🔍 Track</>
               )}
@@ -83,88 +83,95 @@ const TrackItem = ({ addNotification }) => {
       </div>
 
       {item && (
-        <div className="item-details">
-          <div className="item-header">
-            <div className="item-title">
-              <h3>📦 {item.name}</h3>
-              <span className={`status-badge ${item.state}`}>
+        <div className="item-details modern-details">
+          <div className="item-header modern-header">
+            <div className="item-title modern-title">
+              <h3 className="modern-product-title">📦 {item.name}</h3>
+              <span className={`status-badge modern-badge ${item.state}`}>
                 {stateNames[item.state] || 'Unknown State'}
               </span>
             </div>
-            <div className="item-id">
+            <div className="item-id modern-id">
               ID: #{item.id}
             </div>
           </div>
 
-          <div className="details-grid">
-            <div className="detail-card">
-              <h4>🌍 Product Information</h4>
-              <div className="detail-list">
-                <div className="detail-item">
-                  <strong>Name:</strong>
-                  <span>{item.name}</span>
-                </div>
-                <div className="detail-item">
-                  <strong>Origin:</strong>
-                  <span>{item.origin}</span>
-                </div>
-                <div className="detail-item">
-                  <strong>Quality:</strong>
-                  <span className="quality-badge">{item.quality}</span>
-                </div>
-                <div className="detail-item">
-                  <strong>Price:</strong>
-                  <span>{item.price} wei</span>
+          <div className="supply-chain-section modern-supply-section">
+            <div className="supply-chain modern-timeline">
+              <div className="detail-card modern-step-card">
+                <div className="step-header">
+                  <div className="step-icon modern-icon">👨‍🌾</div>
+                  <div className="step-info">
+                    <strong className="modern-step-title">Harvested by Farmer</strong>
+                    <span className="modern-step-value">{formatAddress(item.farmer)}</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="detail-card">
-              <h4>🔗 Supply Chain</h4>
-              <div className="supply-chain">
-                <div className="chain-step">
-                  <div className="step-icon">👨‍🌾</div>
+              <div className="step-arrow modern-arrow">↓</div>
+
+              <div className="detail-card modern-step-card">
+                <div className="step-header">
+                  <div className="step-icon modern-icon">🚚</div>
                   <div className="step-info">
-                    <strong>Farmer</strong>
-                    <span>{formatAddress(item.farmer)}</span>
+                    <strong className="modern-step-title">Purchased by Distributor</strong>
+                    <span className="modern-step-value">{formatAddress(item.distributor)}</span>
                   </div>
                 </div>
+              </div>
 
-                <div className="chain-arrow">↓</div>
+              <div className="step-arrow modern-arrow">↓</div>
 
-                <div className="chain-step">
-                  <div className="step-icon">🚚</div>
+              <div className="detail-card modern-step-card">
+                <div className="step-header">
+                  <div className="step-icon modern-icon">🏪</div>
                   <div className="step-info">
-                    <strong>Distributor</strong>
-                    <span>{formatAddress(item.distributor)}</span>
+                    <strong className="modern-step-title">Received by Retailer</strong>
+                    <span className="modern-step-value">{formatAddress(item.retailer)}</span>
                   </div>
                 </div>
+              </div>
 
-                <div className="chain-arrow">↓</div>
+              <div className="step-arrow modern-arrow">↓</div>
 
-                <div className="chain-step">
-                  <div className="step-icon">🏪</div>
+              <div className="detail-card modern-step-card">
+                <div className="step-header">
+                  <div className="step-icon modern-icon">👤</div>
                   <div className="step-info">
-                    <strong>Retailer</strong>
-                    <span>{formatAddress(item.retailer)}</span>
-                  </div>
-                </div>
-
-                <div className="chain-arrow">↓</div>
-
-                <div className="chain-step">
-                  <div className="step-icon">👤</div>
-                  <div className="step-info">
-                    <strong>Consumer</strong>
-                    <span>{formatAddress(item.consumer)}</span>
+                    <strong className="modern-step-title">Purchased by Consumer</strong>
+                    <span className="modern-step-value">{formatAddress(item.consumer)}</span>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="detail-card qr-card">
-              <h4>📱 QR Code</h4>
-              <div className="qr-section">
+          <div className="info-qr-row modern-info-qr">
+            <div className="detail-card modern-card">
+              <h4 className="modern-card-title">🌍 Product Information</h4>
+              <div className="detail-list modern-list">
+                <div className="detail-item modern-item">
+                  <strong className="modern-label">Name:</strong>
+                  <span className="modern-value">{item.name}</span>
+                </div>
+                <div className="detail-item modern-item">
+                  <strong className="modern-label">Origin:</strong>
+                  <span className="modern-value">{item.origin}</span>
+                </div>
+                <div className="detail-item modern-item">
+                  <strong className="modern-label">Quality:</strong>
+                  <span className="quality-badge modern-quality">{item.quality}</span>
+                </div>
+                <div className="detail-item modern-item">
+                  <strong className="modern-label">Price:</strong>
+                  <span className="modern-value">{item.price} wei</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="detail-card modern-card qr-card modern-qr">
+              <h4 className="modern-card-title">📱 QR Code</h4>
+              <div className="qr-section modern-qr-section">
                 <QRCodeSVG 
                   value={`AgriChain Item #${item.id}: ${item.name} from ${item.origin}`}
                   size={150}
@@ -172,26 +179,26 @@ const TrackItem = ({ addNotification }) => {
                   fgColor="#2d5a87"
                   level="M"
                 />
-                <p className="qr-text">Scan to verify authenticity</p>
+                <p className="qr-text modern-qr-text">Scan to verify authenticity</p>
               </div>
             </div>
           </div>
 
-          <div className="verification-badge">
-            <div className="verification-icon">✅</div>
-            <div className="verification-text">
-              <strong>Blockchain Verified</strong>
-              <p>This item is authentic and traceable on the AgriChain network</p>
+          <div className="verification-badge modern-verification">
+            <div className="verification-icon modern-icon">✅</div>
+            <div className="verification-text modern-verification-text">
+              <strong className="modern-verified-title">Blockchain Verified</strong>
+              <p className="modern-verified-desc">This item is authentic and traceable on the AgriChain network</p>
             </div>
           </div>
         </div>
       )}
 
       {!item && !isLoading && (
-        <div className="empty-state">
-          <div className="empty-icon">🔍</div>
-          <h3>Ready to Track</h3>
-          <p>Enter an item ID above to view its complete supply chain history and verify its authenticity.</p>
+        <div className="empty-state modern-empty">
+          <div className="empty-icon modern-icon">🔍</div>
+          <h3 className="modern-empty-title">Ready to Track</h3>
+          <p className="modern-empty-desc">Enter an item ID above to view its complete supply chain history and verify its authenticity.</p>
         </div>
       )}
     </div>

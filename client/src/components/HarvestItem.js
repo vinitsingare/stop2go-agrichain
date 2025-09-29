@@ -6,7 +6,7 @@ const HarvestItem = ({ accounts, selectedAccount, addNotification }) => {
     origin: '',
     price: '',
     quality: '',
-    account: selectedAccount || accounts[0]
+    account: selectedAccount
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -43,7 +43,7 @@ const HarvestItem = ({ accounts, selectedAccount, addNotification }) => {
           origin: '',
           price: '',
           quality: '',
-          account: selectedAccount || accounts[0]
+          account: selectedAccount
         });
       } else {
         const error = await response.text();
@@ -131,22 +131,14 @@ const HarvestItem = ({ accounts, selectedAccount, addNotification }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="account">Farmer Account *</label>
-            <select
-              id="account"
-              name="account"
-              value={formData.account}
-              onChange={handleInputChange}
-              className="form-select"
-              required
-            >
-              {accounts.map((account, index) => (
-                <option key={account} value={account}>
-                  Account {index + 1}: {account}
-                </option>
-              ))}
-            </select>
-            <small className="form-help">Make sure this account is registered as a farmer</small>
+            <label>Farmer Account</label>
+            <input
+              type="text"
+              value={selectedAccount ? `${selectedAccount.slice(0, 6)}...${selectedAccount.slice(-4)}` : 'No account selected'}
+              className="form-input read-only"
+              readOnly
+            />
+            <small className="form-help">Using selected farmer account</small>
           </div>
 
           <div className="harvest-preview">

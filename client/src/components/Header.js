@@ -4,8 +4,6 @@ const Header = ({ activeTab, setActiveTab }) => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
     { id: 'role-selector', label: 'Select Role', icon: '👥' },
-    { id: 'add-farmer', label: 'Add Farmer', icon: '👨‍🌾' },
-    { id: 'harvest', label: 'Harvest Item', icon: '🌾' },
     { id: 'track', label: 'Track Item', icon: '🔍' }
   ];
 
